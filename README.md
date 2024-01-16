@@ -16,13 +16,13 @@ Connects to 192.168.180.98 port 5000/tcp and accepts connections on port 5002
 
 ## dsmr_from_file.py
 
-    python3 tcp-tee.py heat.dsmr 
+    python3 dsmr_from_file.py heat.dsmr 
 
 Reads DSMR packets stored in a file and outputs them.
 
 ## dsmr_server_from_file.py
 
-    python3 tcp-tee.py heat.dsmr 4002
+    python3 dsmr_server_from_file.py heat.dsmr 4002
 
 Reads DSMR packets stored in a file, accepts connections on port 4002 and serves them round-robin to emulate a DSMR source.
 
