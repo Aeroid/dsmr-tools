@@ -1,6 +1,6 @@
 # dsmr-tools
 
-EasyMeter Q3D for my main energy incl delivery of solar panel generated energy, the second one is a "private" one just to meter my main consumption by a heat pump. Both have IR interfaces which are bridged to ethernet TCP Port 5000 by COM-1 boxes from co-met.info. These COM-1 boxes have a few issues. [see also](https://github.com/ndokter/dsmr_parser/pull/92#issue-1052354779)
+I use an EasyMeter Q3D for my main energy incl delivery of solar panel generated energy, the second one is a "private" one just to meter my main consumption by a heat pump. Both have IR interfaces which are bridged to ethernet TCP Port 5000 by COM-1 boxes from co-met.info. These COM-1 boxes have a few issues. [see also](https://github.com/ndokter/dsmr_parser/pull/92#issue-1052354779)
 
 One very annoying issue that they only accept one TCP connection. Further connections are simply not accepted. 
 
