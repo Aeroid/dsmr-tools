@@ -1,0 +1,14 @@
+[Unit]
+Description=dsmr-power
+Requires=network.target
+
+[Service]
+ExecStart=/usr/bin/python3 tcp-tee.py 192.168.180.50 5000 5001
+WorkingDirectory=/mnt/SW26/Apps/dsmr
+StandardOutput=inherit
+StandardError=inherit
+Restart=always
+User=apps
+
+[Install]
+WantedBy=multi-user.target
