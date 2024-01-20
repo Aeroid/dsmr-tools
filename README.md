@@ -6,13 +6,37 @@ One very annoying issue that they only accept one TCP connection. Further connec
 
 Here are few very simple scripts to run services that connect and read the stream of DSMR packets and serve the last one and any any further one to clients that connect to it. This allows multiple clients to consume the DMSR data streams in parallel.
 
-Nothing fancy. My [Home Assistant](https://www.home-assistant.io/integrations/dsmr) is now redirected to receive from this service and I can also transform the DSMR streams to MQTT to serve [evcc](https://evcc.io/).
+Nothing fancy. My [Home Assistant](https://www.home-assistant.io/integrations/dsmr) is now redirected to receive from this service. 
+My [evcc](https://evcc.io/) is connected to a separate instance of the service utilizing a tranformation of the dsmr telegrams to make the suitable for the [GotSmart](https://github.com/basvdlei/gotsmart) parser used by evcc. [see also](https://github.com/evcc-io/evcc/issues/11772)
 
-## tcp-tee.py
+## tcp-tee-crc.py
 
-    python3 tcp-tee.py 192.168.180.98 5000 5002
+    usage: tcp-tee-crc.py [-h] [-c] [-e] remotehost remoteport serverport
+    
+    DMSR bridge to re-format DSMR suitable for evcc.
+    
+    positional arguments:
+      remotehost  host to read from
+      remoteport  TCP port to read from
+      serverport  TCP port to serve from
 
-Connects to 192.168.180.98 port 5000/tcp and accepts connections on port 5002
+    options:
+      -h, --help  show this help message and exit
+      -c, --crc   Enable CRC mode and removes any junk
+      -e, --evcc  Enable EVCC mode (https://github.com/evcc-io/evcc/issues/11772)
+
+### Example
+    python3 tcp-tee-crc.py 192.168.180.98 5000 5002
+
+Connects to 192.168.180.98 port 5000/tcp and accepts connections on port 5002. The telegrams a forwarded untouched, incl all junk they might contain or are padded with.
+
+    python3 tcp-tee-crc.py 192.168.180.98 5000 5003 --evcc
+
+Removes any junk and modifies the telegrams:
+- adds CRC16, 
+- turns negative consumption (1.7.0) into positive production (2.7.0), 
+- removes "*255", 
+- turns watts into kilo watts.
 
 ## dsmr_from_file.py
 
