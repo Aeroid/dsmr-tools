@@ -3,7 +3,7 @@ Description=dsmr-heat
 Requires=network.target
 
 [Service]
-ExecStart=/usr/bin/python3 tcp-tee.py 192.168.180.98 5000 5002
+ExecStart=/usr/bin/python3 tcp-tee-crc.py 192.168.180.98 5000 5002
 WorkingDirectory=/mnt/SW26/Apps/dsmr
 StandardOutput=inherit
 StandardError=inherit

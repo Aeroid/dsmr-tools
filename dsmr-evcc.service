@@ -1,9 +1,9 @@
 [Unit]
-Description=dsmr-power
+Description=dsmr-evcc
 Requires=network.target
 
 [Service]
-ExecStart=/usr/bin/python3 tcp-tee-crc.py 192.168.180.50 5000 5001
+ExecStart=/usr/bin/python3 tcp-tee-crc.py nas.ds18 5001 5003 -e
 WorkingDirectory=/mnt/SW26/Apps/dsmr
 StandardOutput=inherit
 StandardError=inherit

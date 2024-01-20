@@ -1,5 +1,8 @@
 import sys
 import asyncio
+import argparse
+import re
+from ctypes import c_ushort
 
 sys.stdout.reconfigure(encoding='latin1')
 
@@ -19,13 +22,46 @@ def read_text_records(filename):
 
         return records
 
+crc16_tab = []
+def crc16(telegram):
+    """
+    Calculate the CRC16 value for the given telegram
+
+    :param str telegram:
+    """
+    crcValue = 0x0000
+
+    if len(crc16_tab) == 0:
+        for i in range(0, 256):
+            crc = c_ushort(i).value
+            for j in range(0, 8):
+                if (crc & 0x0001):
+                    crc = c_ushort(crc >> 1).value ^ 0xA001
+                else:
+                    crc = c_ushort(crc >> 1).value
+            crc16_tab.append(hex(crc))
+
+    for c in telegram:
+        d = ord(c)
+        tmp = crcValue ^ d
+        rotated = c_ushort(crcValue >> 8).value
+        crcValue = rotated ^ int(crc16_tab[(tmp & 0x00ff)], 0)
+
+    return crcValue
+
+def add_crc(packet):
+    checksum_contents = re.search(r'\/.+\!', packet, re.DOTALL)
+    crc = crc16(checksum_contents.group(0))
+    
+    return "{}{:04X}\r\n".format(checksum_contents.group(0) , crc)
+
 async def serve_client(reader, writer):
     r=0
     while True:
         try:
             if r >= len(records):
                 r=0
-            response = records[r]
+            response = add_crc(records[r])
             print("["+(kit[:r])+"+"+(kit[:len(kit)-r])+"] :",len(response)," byte\r",end="")
             r+=1
             writer.write(response.encode())
@@ -41,9 +77,15 @@ async def main():
         await server.serve_forever()
 
 if __name__ == "__main__":
-    host = 'localhost'
-    port = sys.argv[1]
-    filename = sys.argv[2]
+    parser = argparse.ArgumentParser(description='A simple script with command-line options.')
+    parser.add_argument('port', help='TCP port to serve from')
+    parser.add_argument('file', help='data file to read DSMR paket from')
+    parser.add_argument('-c', '--crc', action='store_true', help='Enable CRC mode')
+    args = parser.parse_args()
+    host = '0.0.0.0'
+    port = args.port
+    filename = args.file
+    generate_crc = args.crc
     
     records = read_text_records(filename)
     print ("Port:",port,"File:",filename,"Records:",len(records))
